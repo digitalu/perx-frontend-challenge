@@ -1,7 +1,9 @@
 <template>
   <div class="page">
+    <h1>
+      File Upload
+    </h1>
     <section class="section">
-      <h1>File Upload</h1>
       <el-upload
         action=""
         class="el-upload"

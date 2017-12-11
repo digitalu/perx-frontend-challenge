@@ -65,6 +65,8 @@
     },
     mounted() {
       // Sets the default view of map
+      // [TODO]- use correct Event to listen to while binding Google maps
+      // This will show an empty map object when you navigate to a different page
       window.addEventListener('load', () => {
         const element = document.getElementById(this.mapName);
         const options = {
