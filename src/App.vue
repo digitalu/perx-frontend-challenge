@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <router-view/>
+    <aside class="app__side-nav">
+
+    </aside>
+    <div class="app__content">
+      <router-view/>
+    </div>
   </div>
 </template>
 
@@ -10,13 +15,33 @@ export default {
 };
 </script>
 
-<style>
-#app {
+<style lang="scss">
+// Not sure where to put global styles yet.
+body {
+  margin: 0;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
+}
+
+#app {
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100vh;
+
+}
+.app__side-nav {
+  background: #1996d3;
+  width: 200px;
+}
+.app__content {
+  flex: 1 0 0px;
+  padding: 60px;
+}
+.section {
+  margin: 60px 0;
 }
 </style>
