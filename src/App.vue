@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <aside class="app__side-nav">
-
+      <ul>
+        <li>
+          <router-link to="/">File Upload</router-link>
+        </li>
+      </ul>
     </aside>
     <div class="app__content">
       <router-view/>

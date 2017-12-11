@@ -10,11 +10,8 @@
         v-loading="loading"
         :auto-upload="false"
         :limit="1"
-        :http-request="handleFile"
         :onChange="handleOnChange"
-        :on-progress="handleOnProgress"
-        :on-remove="handleOnRemove"
-        :on-success="handleOnSuccess">
+        :on-remove="handleOnRemove">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
         <div class="el-upload__tip" slot="tip">.csv files only</div>
@@ -110,7 +107,8 @@
       </el-row>
     </section>
     <section class="section section__map">
-      <google-map name="marker-map" :markers="markersWithGeolocation"></google-map>
+      <h2>Locations</h2>
+      <google-map name="address-map" :addresses="addressesWithGeolocation"></google-map>
     </section>
   </div>
 </template>
@@ -141,8 +139,8 @@ export default {
         col4: 'category',
       },
       columnNames: ['city', 'state', 'zip', 'address', 'category'],
-      markers: [],
-      markersWithGeolocation: []
+      addresses: [],
+      addressesWithGeolocation: []
     };
   },
   methods: {
@@ -167,15 +165,11 @@ export default {
         complete: this.parseData
       });
     },
-    handleOnProgress() {
-      this.loading = true
-    },
     handleOnRemove(res, file) {
       this.data = [];
+      this.addresses = [];
+      this.addressesWithGeolocation = [];
       this.file = '';
-    },
-    handleOnSuccess(res, file) {
-      this.loading = false
     },
     parseData(response) {
       this.data = response.data
@@ -190,49 +184,43 @@ export default {
       this.isValid = selectedColumns.filter((v,i,a) =>  a.indexOf(v) === i && v !== '').length === 5 ? true : false;
 
       if (this.isValid) {
-        this.createMarkers();
+        this.createAddresses();
       }
     },
-    createMarkers() {
+    createAddresses() {
       let key = this.$googleApiKey,
         googleApiPromises;
 
       for (let item of this.data) {
-        let marker = {};
-        marker[this.columns['col0']] = item[0];
-        marker[this.columns['col1']] = item[1];
-        marker[this.columns['col2']] = item[2];
-        marker[this.columns['col3']] = item[3];
-        marker[this.columns['col4']] = item[4];
-        marker['fullAddress'] = `${marker.address}, ${marker.city}, ${marker.state} ${marker.zip}`;
-        marker['location'] = '';
-        this.markers.push(marker);
+        let address = {};
+        address[this.columns['col0']] = item[0];
+        address[this.columns['col1']] = item[1];
+        address[this.columns['col2']] = item[2];
+        address[this.columns['col3']] = item[3];
+        address[this.columns['col4']] = item[4];
+        address['fullAddress'] = `${address.address}, ${address.city}, ${address.state} ${address.zip}`;
+        address['location'] = '';
+        this.addresses.push(address);
       }
 
-      googleApiPromises = this.markers.map(marker => {
+      googleApiPromises = this.addresses.map(address => {
         return axios.get("https://maps.googleapis.com/maps/api/geocode/json", {
           params: {
-            address: marker.fullAddress,
+            address: address.fullAddress,
             key: key
           }
         }).then(response => {
           if (response.data.status === 'OK') {
             // get first result only
-            marker.location = response.data.results[0].geometry.location;
+            address.location = response.data.results[0].geometry.location;
           }
         })
       })
-
-      axios.all(googleApiPromises)
-        .then(() => {
-          this.markersWithGeolocation = this.markers
-        })
+      axios.all(googleApiPromises).then(() => this.addressesWithGeolocation = this.addresses )
     }
   }
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
   .el-upload {
     display: flex;
